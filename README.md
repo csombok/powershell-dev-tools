@@ -7,7 +7,8 @@ This tool is a self-contained PowerShell module. It can be used by explicitly in
 
 [Please find details here how to install custom PowerShell modules.](https://msdn.microsoft.com/en-us/library/dd878350(v=vs.85).aspx)
 
-# Examples
+
+# Tools
 
 ## Compare NPM dependecies
 
@@ -44,6 +45,16 @@ serve-static                                  dependencies 1.13.1
 strict-transport-security                     dependencies 0.2.1
 uuid                                          dependencies 3.2.1         3.1.0
 ```
+
+### Paremeters
+
+- **SourceNpm**: Path of the *package.json* file to be used as the *source* of the comparison
+- **DestinationNpm**: Path of the *package.json* file to be used as *destination* of the comparison
+- **Filter**: Filter the package name
+- **IncludeEqual**: Include matching packages
+- **IncludeDevDeps**: Include *devDependencies* in comparison
+- **ShowMismatchOnly**: Show package version mismatch only in the result
+
 
 ## Compare DLLs in source directories
 
