@@ -180,7 +180,10 @@ function Compare-Npm
         [switch]
         $IncludeEqual,
         [switch]
-        $IncludeDevDeps
+        $IncludeDevDeps,
+        [switch]
+        $ShowMismatchOnly
+
     )
 
     $sourcePackages = Get-Content -Path $SourceNpm | ConvertFrom-Json
@@ -254,6 +257,14 @@ function Compare-Npm
         }   
     }
 
+    if(-not [string]::IsNullOrWhiteSpace($Filter)) {
+        $result = $result | Where-Object { $_.Name -like "*$Filter*" }
+    }
+
+    if($ShowMismatchOnly.IsPresent) {
+        $result = $result | Where-Object { (-not [string]::IsNullOrWhiteSpace($_.SourceVersion)) -and  (-not [string]::IsNullOrWhiteSpace($_.DestinationVersion))  }
+    }
+
     if($IncludeEqual.IsPresent -and $IncludeDevDeps.IsPresent) {
         $result | ft Name, Type, SourceVersion, DestinationVersion
     } elseif($IncludeEqual.IsPresent -and -not $IncludeDevDeps.IsPresent) {
@@ -263,6 +274,8 @@ function Compare-Npm
     } elseif(-not $IncludeEqual.IsPresent -and -not $IncludeDevDeps.IsPresent) { 
         $result | Where-Object {$_.SourceVersion -ne $_.DestinationVersion -and $_.Type -eq 'dependencies'} | ft Name, Type, SourceVersion, DestinationVersion
     }
+
+    
 }
 
 
