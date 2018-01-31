@@ -172,10 +172,10 @@ function Compare-Npm
     (
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path $_ -PathType Leaf})]
-        $SourceNpm,
+        $Source,
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path $_ -PathType Leaf})]
-        $DestinationNpm,
+        $Destination,
         $Filter,
         [switch]
         $IncludeEqual,
@@ -188,19 +188,19 @@ function Compare-Npm
 
     )
 
-    $sourcePackages = Get-Content -Path $SourceNpm | ConvertFrom-Json
+    $sourcePackages = Get-Content -Path $Source | ConvertFrom-Json
 
-    $destinationPackages = Get-Content -Path $DestinationNpm | ConvertFrom-Json
+    $destinationPackages = Get-Content -Path $Destination | ConvertFrom-Json
 
     $result = @()
 
     if($sourcePackages.dependencies) {
         $sourcePackages.dependencies.PSObject.Properties | foreach {
             $packageItem = New-Object PSObject -Property @{            
-                Name       = $_.Name
-                Type       = 'dependencies'     
-                SourceVersion = $_.Value
-                DestinationVersion  = $null }
+                Name = $_.Name
+                Type = 'dependencies'     
+                Source = $_.Value
+                Destination = $null }
 
             $result += $packageItem
         }   
@@ -209,10 +209,10 @@ function Compare-Npm
     if($sourcePackages.devDependencies) {
         $sourcePackages.dependencies.PSObject.Properties | foreach {
             $packageItem = New-Object PSObject -Property @{            
-                Name       = $_.Name
-                Type       = 'devDependencies'     
-                SourceVersion = $_.Value
-                DestinationVersion  = $null }
+                Name  = $_.Name
+                Type  = 'devDependencies'     
+                Source = $_.Value
+                Destination = $null }
 
             $result += $packageItem
         }   
@@ -226,13 +226,13 @@ function Compare-Npm
             $existing = $result | Where-Object {$_.Name -eq $dependency.Name -and $_.Type -eq 'dependencies'} | Select -First 1
 
             if($existing) {
-                $existing.DestinationVersion = $dependency.Value
+                $existing.Destination = $dependency.Value
             } else {        
                 $packageItem = New-Object PSObject -Property @{            
-                    Name       = $_.Name
-                    Type       = 'dependencies'     
-                    SourceVersion = $null
-                    DestinationVersion  = $dependency.Value }
+                    Name = $_.Name
+                    Type = 'dependencies'     
+                    Source = $null
+                    Destination  = $dependency.Value }
 
                 $result += $packageItem
             }
@@ -246,13 +246,13 @@ function Compare-Npm
             $existing = $result | Where-Object {$_.Name -eq $dependency.Name -and $_.Type -eq 'devDependencies'} | Select -First 1
 
             if($existing) {
-                $existing.DestinationVersion = $dependency.Value
+                $existing.Destination = $dependency.Value
             } else {        
                 $packageItem = New-Object PSObject -Property @{            
-                    Name       = $_.Name
-                    Type       = 'devDependencies'     
-                    SourceVersion = $null
-                    DestinationVersion  = $dependency.Value }
+                    Name = $_.Name
+                    Type = 'devDependencies'     
+                    Source = $null
+                    Destination = $dependency.Value }
 
                 $result += $packageItem
             }
@@ -264,7 +264,7 @@ function Compare-Npm
     }
 
     if($ShowMismatchOnly.IsPresent) {
-        $result = $result | Where-Object { (-not [string]::IsNullOrWhiteSpace($_.SourceVersion)) -and  (-not [string]::IsNullOrWhiteSpace($_.DestinationVersion))  }
+        $result = $result | Where-Object { (-not [string]::IsNullOrWhiteSpace($_.Source)) -and  (-not [string]::IsNullOrWhiteSpace($_.Destination))  }
     }
 
     if($IncludeEqual.IsPresent -and $IncludeDevDeps.IsPresent) {
@@ -272,9 +272,9 @@ function Compare-Npm
     } elseif($IncludeEqual.IsPresent -and -not $IncludeDevDeps.IsPresent) {
         $result =  $result | Where-Object {$_.Type -eq 'dependencies'}
     } elseif(-not $IncludeEqual.IsPresent -and $IncludeDevDeps.IsPresent) {
-        $result =  $result | Where-Object {$_.SourceVersion -ne $_.DestinationVersion}
+        $result =  $result | Where-Object {$_.Source -ne $_.Destination}
     } elseif(-not $IncludeEqual.IsPresent -and -not $IncludeDevDeps.IsPresent) { 
-        $result =  $result | Where-Object {$_.SourceVersion -ne $_.DestinationVersion -and $_.Type -eq 'dependencies'}
+        $result =  $result | Where-Object {$_.Source -ne $_.Destination -and $_.Type -eq 'dependencies'}
     }
 
     if($LatestVersionInfo.IsPresent) {
@@ -290,11 +290,11 @@ function Compare-Npm
             
             $_ | Add-Member Latest $latestVersion
 
-            $_ |  Select Name, Type, SourceVersion, DestinationVersion, Latest
+            $_ |  Select Name, Type, Source, Destination, Latest
         }
-        $result | ft Name, Type, SourceVersion, DestinationVersion, Latest
+        $result | ft Name, Type, Source, Destination, Latest
     } else {
-        $result | ft Name, Type, SourceVersion, DestinationVersion
+        $result | ft Name, Type, Source, Destination
     }    
     
 }

@@ -28,28 +28,18 @@ npmCompare c:\examples\first\package.json c:\examples\second\package.json -Inclu
 
 **Example output:**
 ```
-Name                                          Type         SourceVersion DestinationVersion
-----                                          ----         ------------- ------------------
-@google-cloud/bigquery                        dependencies 1.0.0         ^0.9.6
-@google-cloud/datastore                       dependencies 1.1.0         1.0.4
-async                                         dependencies 2.6.0         2.3.0
-body-parser                                   dependencies 1.18.2
-cors                                          dependencies 2.8.4
-debug                                         dependencies 3.1.0         2.6.8
-es6-promise                                   dependencies 4.2.2
-express                                       dependencies 4.16.2
-helmet                                        dependencies 3.9.0
-parseurl                                      dependencies 1.3.2
-path-to-regexp                                dependencies 2.1.0
-serve-static                                  dependencies 1.13.1
-strict-transport-security                     dependencies 0.2.1
-uuid                                          dependencies 3.2.1         3.1.0
+Name                      Type         Source Destination Latest
+----                      ----         ------ ----------- ------
+@google-cloud/bigquery    dependencies 1.0.0  ^0.9.6      1.0.0
+@google-cloud/datastore   dependencies 1.1.0  1.0.4       1.3.3
+@google-cloud/debug-agent dependencies 2.3.2  2.1.2       2.3.2
+@google-cloud/storage     dependencies 1.5.2  1.2.0       1.5.2
 ```
 
 ### Paremeters
 
-- **SourceNpm**: Path of the *package.json* file to be used as the *source* of the comparison
-- **DestinationNpm**: Path of the *package.json* file to be used as *destination* of the comparison
+- **Source**: Path of the *package.json* file to be used as the *source* of the comparison
+- **Destination**: Path of the *package.json* file to be used as *destination* of the comparison
 - **Filter**: Filter result by package name
 - **IncludeEqual**: Include matching packages in the result
 - **IncludeDevDeps**: Include *devDependencies* in comparison result
