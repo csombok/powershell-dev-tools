@@ -50,10 +50,11 @@ uuid                                          dependencies 3.2.1         3.1.0
 
 - **SourceNpm**: Path of the *package.json* file to be used as the *source* of the comparison
 - **DestinationNpm**: Path of the *package.json* file to be used as *destination* of the comparison
-- **Filter**: Filter the package name
-- **IncludeEqual**: Include matching packages
-- **IncludeDevDeps**: Include *devDependencies* in comparison
+- **Filter**: Filter result by package name
+- **IncludeEqual**: Include matching packages in the result
+- **IncludeDevDeps**: Include *devDependencies* in comparison result
 - **ShowMismatchOnly**: Show package version mismatch only in the result
+- **LatestVersionInfo**: Show latest npm package version in the result
 
 
 ## Compare DLLs in source directories

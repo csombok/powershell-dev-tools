@@ -182,7 +182,9 @@ function Compare-Npm
         [switch]
         $IncludeDevDeps,
         [switch]
-        $ShowMismatchOnly
+        $ShowMismatchOnly,
+        [switch]
+        $LatestVersionInfo
 
     )
 
@@ -266,15 +268,34 @@ function Compare-Npm
     }
 
     if($IncludeEqual.IsPresent -and $IncludeDevDeps.IsPresent) {
-        $result | ft Name, Type, SourceVersion, DestinationVersion
+        $result = $result
     } elseif($IncludeEqual.IsPresent -and -not $IncludeDevDeps.IsPresent) {
-        $result | Where-Object {$_.Type -eq 'dependencies'} | ft Name, Type, SourceVersion, DestinationVersion
+        $result =  $result | Where-Object {$_.Type -eq 'dependencies'}
     } elseif(-not $IncludeEqual.IsPresent -and $IncludeDevDeps.IsPresent) {
-        $result | Where-Object {$_.SourceVersion -ne $_.DestinationVersion} | ft Name, Type, SourceVersion, DestinationVersion
+        $result =  $result | Where-Object {$_.SourceVersion -ne $_.DestinationVersion}
     } elseif(-not $IncludeEqual.IsPresent -and -not $IncludeDevDeps.IsPresent) { 
-        $result | Where-Object {$_.SourceVersion -ne $_.DestinationVersion -and $_.Type -eq 'dependencies'} | ft Name, Type, SourceVersion, DestinationVersion
+        $result =  $result | Where-Object {$_.SourceVersion -ne $_.DestinationVersion -and $_.Type -eq 'dependencies'}
     }
 
+    if($LatestVersionInfo.IsPresent) {
+        $result | ForEach-Object {
+
+            $latestVersion = 'N/A'
+            try {
+                $remotePackageInfo = npm view $_.Name | ConvertFrom-Json
+                if($remotePackageInfo) { $latestVersion =  $remotePackageInfo.version }
+            } catch {
+                $latestVersion = "Error - $($_.Exception.Message)"
+            }
+            
+            $_ | Add-Member Latest $latestVersion
+
+            $_ |  Select Name, Type, SourceVersion, DestinationVersion, Latest
+        }
+        $result | ft Name, Type, SourceVersion, DestinationVersion, Latest
+    } else {
+        $result | ft Name, Type, SourceVersion, DestinationVersion
+    }    
     
 }
 
